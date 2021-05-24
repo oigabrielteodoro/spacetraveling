@@ -1,7 +1,6 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
 
-import { RichText } from 'prismic-dom';
 import Prismic from '@prismicio/client';
 
 import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
