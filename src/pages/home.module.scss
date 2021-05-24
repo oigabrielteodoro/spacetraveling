@@ -1,13 +1,5 @@
-.container {
-  max-width: 700px;
-  margin: 0 auto;
-
-  display: flex;
-  flex-direction: column;
-}
-
-.logo {
-  margin: 79px auto 64px 0;
+.header {
+  margin: 79px auto 65px 0;
 }
 
 .posts {
@@ -51,5 +43,24 @@
     svg {
       margin-right: 10px;
     }
+  }
+}
+
+.loadMorePostsButton {
+  background: transparent;
+  border: 0;
+
+  color: var(--highlight);
+
+  font-weight: 600;
+  font-size: 18px;
+
+  margin-right: auto;
+  margin-top: 65px;
+
+  transition: filter 0.2s;
+
+  &:hover {
+    filter: brightness(0.8);
   }
 }

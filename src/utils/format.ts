@@ -6,11 +6,13 @@ export const applyUppercase = (text: string) => {
 };
 
 export const formatDate = (dateToFormat: string) => {
-  const monthFormatted = applyUppercase(
-    format(new Date(dateToFormat), 'MMM', {
-      locale: ptBR,
-    })
-  );
+  // const monthFormatted = applyUppercase(
+  //   format(new Date(dateToFormat), 'MMM', {
+  //     locale: ptBR,
+  //   })
+  // );
 
-  return format(new Date(dateToFormat), `dd '${monthFormatted}' yyyy`);
+  return format(new Date(dateToFormat), `dd MMM yyyy`, {
+    locale: ptBR,
+  });
 };

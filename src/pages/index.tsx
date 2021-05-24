@@ -10,6 +10,9 @@ import { formatDate } from '../utils/format';
 import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
+
+import Header from '../components/Header';
+
 import styles from './home.module.scss';
 
 interface Post {
@@ -46,13 +49,9 @@ export default function Home({ postsPagination }: HomeProps) {
         <title>Posts | Spacetraveling</title>
       </Head>
 
-      <main className={styles.container}>
-        <img
-          src="/static/logo.svg"
-          alt="Spacetraveling Logo"
-          className={styles.logo}
-        />
+      <Header className={styles.header} />
 
+      <main className={commonStyles.container}>
         <ul className={styles.posts}>
           {posts.map(post => (
             <li key={post.id} className={styles.post}>
@@ -72,6 +71,12 @@ export default function Home({ postsPagination }: HomeProps) {
             </li>
           ))}
         </ul>
+
+        {postsPagination.next_page && (
+          <button type="button" className={styles.loadMorePostsButton}>
+            Carregar mais posts
+          </button>
+        )}
       </main>
     </>
   );
