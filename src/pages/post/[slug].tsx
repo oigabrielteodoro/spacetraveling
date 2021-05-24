@@ -1,5 +1,6 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
 
+import Link from 'next/link';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
@@ -14,6 +15,7 @@ import { getPrismicClient } from '../../services/prismic';
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
 import { formatDate } from '../../utils/format';
+import { useUtterances } from '../../hooks/useUtterances';
 
 interface PostContent {
   heading: string;
@@ -36,10 +38,13 @@ interface Post {
 
 interface PostProps {
   post: Post;
+  preview?: boolean;
 }
 
-export default function Post({ post }: PostProps) {
+export default function Post({ post, preview }: PostProps) {
   const { isFallback } = useRouter();
+
+  useUtterances(process.env.NEXT_PUBLIC_UTTERANCE_NODE_ID);
 
   const createdAt = formatDate(post.first_publication_date);
 
@@ -106,6 +111,27 @@ export default function Post({ post }: PostProps) {
               ))}
             </div>
           </div>
+
+          <hr className={styles.separator} />
+
+          <div className={styles.navigation}>
+            <div className={styles.postToNavigate}>
+              <span>Como utilizar Hooks</span>
+              <button type="button">Post anterior</button>
+            </div>
+            <div className={styles.postToNavigate}>
+              <span>Criando um app CRA do Zero</span>
+              <button type="button">Próximo post</button>
+            </div>
+          </div>
+
+          <div id={process.env.NEXT_PUBLIC_UTTERANCE_NODE_ID} />
+
+          {preview && (
+            <Link href="/api/exit-preview">
+              <a className={commonStyles.exitPreview}>Sair do modo Preview</a>
+            </Link>
+          )}
         </div>
       </main>
     </>
@@ -132,16 +158,23 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export const getStaticProps: GetStaticProps = async context => {
+export const getStaticProps: GetStaticProps = async ({
+  params,
+  preview = false,
+  previewData,
+}) => {
   const prismic = getPrismicClient();
 
-  const { slug = '' } = context.params;
+  const { slug = '' } = params;
 
-  const post = await prismic.getByUID('post', slug as string, {});
+  const post = await prismic.getByUID('post', slug as string, {
+    ref: previewData?.ref ?? null,
+  });
 
   return {
     props: {
       post,
+      preview,
     },
   };
 };

@@ -3,7 +3,7 @@
 }
 
 .post {
-  margin: 80px 0;
+  margin-top: 80px;
 
   h1 {
     font-size: 48px;
@@ -57,6 +57,54 @@
     & + span {
       display: block;
       margin-top: 30px;
+    }
+  }
+}
+
+.separator {
+  border: 1px solid #D7D7D710;
+  margin: 60px 0 48px;
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 80px;
+}
+
+.postToNavigate {
+  display: flex;
+  flex-direction: column;
+
+  &:first-child {
+    align-items: flex-start;
+  }
+
+  &:last-child {
+    align-items: flex-end;
+  }
+
+  span {
+    font-size: 18px;
+    line-height: 21px;
+  }
+
+  button {
+    background: transparent;
+    border: 0;
+
+    color: var(--highlight);
+    font-weight: 600;
+
+    line-height: 20px;
+    margin-top: 8px;
+
+    transition: filter 0.2s;
+
+    &:hover {
+      filter: brightness(0.8);
     }
   }
 }

@@ -1,7 +1,5 @@
 import Link from 'next/link';
 
-import commonStyles from '../../styles/common.module.scss';
-
 import styles from './header.module.scss';
 
 interface HeaderProps {
@@ -10,7 +8,7 @@ interface HeaderProps {
 
 export default function Header({ className = styles.logo }: HeaderProps) {
   return (
-    <header className={commonStyles.container}>
+    <header className={styles.container}>
       <Link href="/">
         <a className={className}>
           <img src="/static/logo.svg" alt="logo" />
