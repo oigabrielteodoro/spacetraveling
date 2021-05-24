@@ -13,7 +13,7 @@ export default function Header({ className = styles.logo }: HeaderProps) {
     <header className={commonStyles.container}>
       <Link href="/">
         <a className={className}>
-          <img src="/static/logo.svg" alt="Spacetraveling Logo" />
+          <img src="/static/logo.svg" alt="logo" />
         </a>
       </Link>
     </header>

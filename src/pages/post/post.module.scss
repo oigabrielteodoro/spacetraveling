@@ -1,1 +1,66 @@
-.container {}
+.banner {
+  width: 100%;
+}
+
+.post {
+  margin: 80px 0;
+
+  h1 {
+    font-size: 48px;
+    line-height: 58px;
+  }
+}
+
+.postInformation {
+  display: flex;
+  align-items: center;
+
+  margin-right: auto;
+  margin-top: 24px;
+
+  div {
+    color: var(--info);
+
+    display: flex;
+    align-items: center;
+
+    font-size: 14px;
+
+    span {
+      font-size: 16px;
+    }
+
+    & + div {
+      margin-left: 26px;
+    }
+
+    svg {
+      margin-right: 10px;
+    }
+  }
+}
+
+.contentContainer {
+
+}
+
+.content {
+  margin-top: 65px;
+
+  h2 {
+    font-size: 36px;
+    line-height: 50px;
+    margin-bottom: 45px;
+  }
+
+  span {
+    color: var(--info);
+    font-size: 18px;
+    line-height: 25px;
+
+    & + span {
+      display: block;
+      margin-top: 30px;
+    }
+  }
+}
