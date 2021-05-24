@@ -1,5 +1,9 @@
+import { useState } from 'react';
+
 import { GetStaticPaths, GetStaticProps } from 'next';
+
 import Head from 'next/head';
+import Link from 'next/link';
 
 import Prismic from '@prismicio/client';
 
@@ -35,13 +39,39 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps) {
-  const posts = postsPagination.results.map(post => ({
-    id: post.uid,
-    title: post.data.title,
-    subtitle: post.data.subtitle,
-    author: post.data.author,
-    createdAt: formatDate(post.first_publication_date),
-  }));
+  const [nextPage, setNextPage] = useState(postsPagination.next_page);
+
+  const [posts, setPosts] = useState(
+    postsPagination.results.map(post => ({
+      slug: post.uid,
+      title: post.data.title,
+      subtitle: post.data.subtitle,
+      author: post.data.author,
+      createdAt: formatDate(post.first_publication_date),
+    }))
+  );
+
+  const isLoadMore = !!nextPage;
+
+  async function handleLoadMore() {
+    fetch(nextPage)
+      .then(response => {
+        return response.json();
+      })
+      .then((data: PostPagination) => {
+        const newPosts = data.results.map(post => ({
+          slug: post.uid,
+          title: post.data.title,
+          subtitle: post.data.subtitle,
+          author: post.data.author,
+          createdAt: formatDate(post.first_publication_date),
+        }));
+
+        setPosts(prevState => [...prevState, ...newPosts]);
+
+        setNextPage(data.next_page);
+      });
+  }
 
   return (
     <>
@@ -54,26 +84,34 @@ export default function Home({ postsPagination }: HomeProps) {
       <main className={commonStyles.container}>
         <ul className={styles.posts}>
           {posts.map(post => (
-            <li key={post.id} className={styles.post}>
-              <h1>{post.title}</h1>
-              <span>{post.subtitle}</span>
+            <li key={post.slug} className={styles.post}>
+              <Link href={`/post/${post.slug}`}>
+                <a>
+                  <h1>{post.title}</h1>
+                  <span>{post.subtitle}</span>
 
-              <div className={styles.postInformation}>
-                <div>
-                  <FiCalendar size={20} />
-                  {post.createdAt}
-                </div>
-                <div>
-                  <FiUser size={20} />
-                  {post.author}
-                </div>
-              </div>
+                  <div className={styles.postInformation}>
+                    <div>
+                      <FiCalendar size={20} />
+                      {post.createdAt}
+                    </div>
+                    <div>
+                      <FiUser size={20} />
+                      {post.author}
+                    </div>
+                  </div>
+                </a>
+              </Link>
             </li>
           ))}
         </ul>
 
-        {postsPagination.next_page && (
-          <button type="button" className={styles.loadMorePostsButton}>
+        {isLoadMore && (
+          <button
+            type="button"
+            className={styles.loadMorePostsButton}
+            onClick={handleLoadMore}
+          >
             Carregar mais posts
           </button>
         )}
@@ -96,7 +134,7 @@ export const getStaticProps: GetStaticProps = async () => {
     [Prismic.predicates.at('document.type', 'post')],
     {
       fetch: ['post.title', 'post.subtitle', 'post.author'],
-      pageSize: 10,
+      pageSize: 1,
     }
   );
 
