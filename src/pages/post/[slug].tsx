@@ -1,10 +1,12 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
+
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 
 import Prismic from '@prismicio/client';
 
 import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
-import { useRouter } from 'next/router';
+
 import Header from '../../components/Header';
 
 import { getPrismicClient } from '../../services/prismic';
@@ -40,6 +42,17 @@ export default function Post({ post }: PostProps) {
   const { isFallback } = useRouter();
 
   const createdAt = formatDate(post.first_publication_date);
+
+  function getMinutesToRead() {
+    const allText = post.data.content
+      .map(postContent =>
+        postContent.body.map(postContentBody => postContentBody.text)
+      )
+      .join(' ')
+      .split(' ');
+
+    return Math.round(allText.length / 150);
+  }
 
   if (isFallback) {
     return <h1>Carregando...</h1>;
@@ -77,7 +90,7 @@ export default function Post({ post }: PostProps) {
               </div>
               <div>
                 <FiClock size={20} />
-                <span>4 min</span>
+                <span>{getMinutesToRead()} min</span>
               </div>
             </div>
 
