@@ -78,12 +78,12 @@
   display: flex;
   flex-direction: column;
 
-  &:first-child {
-    align-items: flex-start;
+  &.next {
+    align-items: flex-end;
   }
 
-  &:last-child {
-    align-items: flex-end;
+  &.previous {
+    align-items: flex-start;
   }
 
   span {
@@ -107,4 +107,11 @@
       filter: brightness(0.8);
     }
   }
+}
+
+.updatedAt {
+  display: block;
+  color: var(--info);
+  margin-top: 12px;
+  font-size: 14px;
 }

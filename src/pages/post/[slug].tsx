@@ -4,18 +4,24 @@ import Link from 'next/link';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+
 import Prismic from '@prismicio/client';
 
 import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
+
+import { formatDate } from '../../utils/format';
+
+import { useUtterances } from '../../hooks/useUtterances';
 
 import Header from '../../components/Header';
 
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
+
 import styles from './post.module.scss';
-import { formatDate } from '../../utils/format';
-import { useUtterances } from '../../hooks/useUtterances';
 
 interface PostContent {
   heading: string;
@@ -24,7 +30,9 @@ interface PostContent {
   }[];
 }
 interface Post {
+  uid: string;
   first_publication_date: string | null;
+  last_publication_date: string;
   data: {
     title: string;
     banner: {
@@ -38,15 +46,28 @@ interface Post {
 
 interface PostProps {
   post: Post;
+  nextPost?: Post;
+  prevPost?: Post;
   preview?: boolean;
 }
 
-export default function Post({ post, preview }: PostProps) {
+export default function Post({ post, nextPost, prevPost, preview }: PostProps) {
   const { isFallback } = useRouter();
 
   useUtterances(process.env.NEXT_PUBLIC_UTTERANCE_NODE_ID);
 
   const createdAt = formatDate(post.first_publication_date);
+
+  const updatedAt =
+    post.last_publication_date !== post.first_publication_date
+      ? format(
+          new Date(post.last_publication_date),
+          "'editado em' dd 'de' MMM yyyy', às' HH:mm",
+          {
+            locale: ptBR,
+          }
+        )
+      : '';
 
   function getMinutesToRead() {
     const allText = post.data.content
@@ -99,6 +120,8 @@ export default function Post({ post, preview }: PostProps) {
               </div>
             </div>
 
+            {updatedAt && <i className={styles.updatedAt}>* {updatedAt}</i>}
+
             <div className={styles.contentContainer}>
               {post.data.content.map((content, index) => (
                 <div key={String(index)} className={styles.content}>
@@ -115,14 +138,28 @@ export default function Post({ post, preview }: PostProps) {
           <hr className={styles.separator} />
 
           <div className={styles.navigation}>
-            <div className={styles.postToNavigate}>
-              <span>Como utilizar Hooks</span>
-              <button type="button">Post anterior</button>
-            </div>
-            <div className={styles.postToNavigate}>
-              <span>Criando um app CRA do Zero</span>
-              <button type="button">Próximo post</button>
-            </div>
+            {prevPost ? (
+              <div
+                className={[styles.postToNavigate, styles.previous].join(' ')}
+              >
+                <span>{prevPost.data.title}</span>
+                <Link href={`/post/${prevPost.uid}`}>
+                  <button type="button">Post anterior</button>
+                </Link>
+              </div>
+            ) : (
+              <div />
+            )}
+            {nextPost ? (
+              <div className={[styles.postToNavigate, styles.next].join(' ')}>
+                <span>{nextPost.data.title}</span>
+                <Link href={`/post/${nextPost.uid}`}>
+                  <button type="button">Próximo post</button>
+                </Link>
+              </div>
+            ) : (
+              <div />
+            )}
           </div>
 
           <div id={process.env.NEXT_PUBLIC_UTTERANCE_NODE_ID} />
@@ -171,10 +208,45 @@ export const getStaticProps: GetStaticProps = async ({
     ref: previewData?.ref ?? null,
   });
 
+  const posts = await prismic.query([
+    Prismic.predicates.at('document.type', 'post'),
+  ]);
+
+  const postIndex = posts.results.findIndex(
+    postItem => postItem.id === post.id
+  );
+
+  const nextPost = posts.results[postIndex + 1];
+  const prevPost = posts.results[postIndex - 1];
+
   return {
     props: {
       post,
       preview,
+      nextPost: nextPost
+        ? {
+            ...nextPost,
+            data: {
+              ...nextPost.data,
+              title:
+                nextPost.data.title.length > 30
+                  ? `${nextPost.data.title.slice(0, 30)}...`
+                  : nextPost.data.title,
+            },
+          }
+        : null,
+      prevPost: prevPost
+        ? {
+            ...prevPost,
+            data: {
+              ...prevPost.data,
+              title:
+                prevPost.data.title.length > 30
+                  ? `${prevPost.data.title.slice(0, 30)}...`
+                  : prevPost.data.title,
+            },
+          }
+        : null,
     },
   };
 };
